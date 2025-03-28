@@ -59,24 +59,24 @@ You can install Postman via this website: https://www.postman.com/downloads/
     -   Open another new terminal, edit `ROCKET_PORT` in `.env` to `8003`, then execute `cargo run`.
 
 ## Mandatory Checklists (Subscriber)
--   [ ] Clone https://gitlab.com/ichlaffterlalu/bambangshop-receiver to a new repository.
+-   [x] Clone https://gitlab.com/ichlaffterlalu/bambangshop-receiver to a new repository.
 -   **STAGE 1: Implement models and repositories**
-    -   [ ] Commit: `Create Notification model struct.`
-    -   [ ] Commit: `Create SubscriberRequest model struct.`
-    -   [ ] Commit: `Create Notification database and Notification repository struct skeleton.`
-    -   [ ] Commit: `Implement add function in Notification repository.`
-    -   [ ] Commit: `Implement list_all_as_string function in Notification repository.`
-    -   [ ] Write answers of your learning module's "Reflection Subscriber-1" questions in this README.
+    -   [x] Commit: `Create Notification model struct.`
+    -   [x] Commit: `Create SubscriberRequest model struct.`
+    -   [x] Commit: `Create Notification database and Notification repository struct skeleton.`
+    -   [x] Commit: `Implement add function in Notification repository.`
+    -   [x] Commit: `Implement list_all_as_string function in Notification repository.`
+    -   [x] Write answers of your learning module's "Reflection Subscriber-1" questions in this README.
 -   **STAGE 3: Implement services and controllers**
-    -   [ ] Commit: `Create Notification service struct skeleton.`
-    -   [ ] Commit: `Implement subscribe function in Notification service.`
-    -   [ ] Commit: `Implement subscribe function in Notification controller.`
-    -   [ ] Commit: `Implement unsubscribe function in Notification service.`
-    -   [ ] Commit: `Implement unsubscribe function in Notification controller.`
-    -   [ ] Commit: `Implement receive_notification function in Notification service.`
-    -   [ ] Commit: `Implement receive function in Notification controller.`
-    -   [ ] Commit: `Implement list_messages function in Notification service.`
-    -   [ ] Commit: `Implement list function in Notification controller.`
+    -   [x] Commit: `Create Notification service struct skeleton.`
+    -   [x] Commit: `Implement subscribe function in Notification service.`
+    -   [x] Commit: `Implement subscribe function in Notification controller.`
+    -   [x] Commit: `Implement unsubscribe function in Notification service.`
+    -   [x] Commit: `Implement unsubscribe function in Notification controller.`
+    -   [x] Commit: `Implement receive_notification function in Notification service.`
+    -   [x] Commit: `Implement receive function in Notification controller.`
+    -   [x] Commit: `Implement list_messages function in Notification service.`
+    -   [x] Commit: `Implement list function in Notification controller.`
     -   [ ] Write answers of your learning module's "Reflection Subscriber-2" questions in this README.
 
 ## Your Reflections
@@ -85,5 +85,28 @@ This is the place for you to write reflections:
 ### Mandatory (Subscriber) Reflections
 
 #### Reflection Subscriber-1
+1. RwLock vs Mutex:
+
+    Dalam tutorial ini, kita menggunakan RwLock<Vec<Notification>> untuk menyinkronkan akses ke koleksi notifikasi kita. RwLock (Read-Write Lock) diperlukan karena memungkinkan beberapa pembaca untuk mengakses data secara bersamaan, sementara memastikan akses eksklusif saat menulis. Ini sangat penting untuk sistem notifikasi kita di mana:
+
+   - Membaca notifikasi (menampilkannya) terjadi sering dan dapat dilakukan secara paralel.
+
+   - Menambahkan notifikasi baru (menulis) terjadi lebih jarang tetapi memerlukan akses eksklusif.
+
+    Kita tidak menggunakan Mutex karena akan kurang efisien dalam skenario ini. Mutex menyediakan akses eksklusif untuk operasi membaca dan menulis, yang berarti hanya satu thread yang dapat membaca notifikasi pada satu waktu. Ini akan membatasi kinerja secara tidak perlu ketika ada beberapa permintaan baca yang bersamaan, karena mereka harus menunggu satu sama lain meskipun tidak mengubah data.
+
+2. Variabel Statik di Rust vs Java:
+
+    Di Rust, variabel statik diperlakukan berbeda dari Java karena prinsip kepemilikan dan keamanan di Rust. Di Java, kita dapat dengan bebas mengubah variabel statik melalui metode statik tanpa banyak pertimbangan. Namun, Rust secara ketat menegakkan keamanan memori dan mencegah race data bahkan dengan variabel statik.
+
+    Perbedaan utamanya adalah bahwa Rust memerlukan mekanisme sinkronisasi eksplisit (seperti RwLock atau Mutex) saat memodifikasi data statik yang dapat diubah untuk menjamin keamanan thread. Inilah mengapa kita menggunakan lazy_static yang digabungkan dengan RwLock - ini memungkinkan kita untuk:
+
+   - Memiliki variabel "static" yang dapat diinisialisasi saat runtime.
+
+   - Dengan aman mengubah isinya di beberapa thread.
+
+   - Menjamin akses thread-safe ke data tersebut.
+
+    Tanpa mekanisme ini, Rust tidak akan mengizinkan perubahan variabel statik karena dapat menyebabkan race data dan akses memori yang tidak aman dalam lingkungan multithreaded. Ini mencerminkan filosofi Rust tentang "konkurensi tanpa rasa takut" di mana kompiler menegakkan keamanan thread pada waktu kompilasi daripada menangani bug konkurensi pada waktu runtime.
 
 #### Reflection Subscriber-2
