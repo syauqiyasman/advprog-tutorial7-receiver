@@ -77,7 +77,7 @@ You can install Postman via this website: https://www.postman.com/downloads/
     -   [x] Commit: `Implement receive function in Notification controller.`
     -   [x] Commit: `Implement list_messages function in Notification service.`
     -   [x] Commit: `Implement list function in Notification controller.`
-    -   [ ] Write answers of your learning module's "Reflection Subscriber-2" questions in this README.
+    -   [x] Write answers of your learning module's "Reflection Subscriber-2" questions in this README.
 
 ## Your Reflections
 This is the place for you to write reflections:
@@ -110,3 +110,40 @@ This is the place for you to write reflections:
     Tanpa mekanisme ini, Rust tidak akan mengizinkan perubahan variabel statik karena dapat menyebabkan race data dan akses memori yang tidak aman dalam lingkungan multithreaded. Ini mencerminkan filosofi Rust tentang "konkurensi tanpa rasa takut" di mana kompiler menegakkan keamanan thread pada waktu kompilasi daripada menangani bug konkurensi pada waktu runtime.
 
 #### Reflection Subscriber-2
+1. Mengeksplorasi Lebih Lanjut di Luar Langkah-Langkah Tutorial:
+
+    Ya, saya mengeksplorasi lebih jauh di luar langkah-langkah tutorial, khususnya di src/lib.rs. File ini berfungsi sebagai titik masuk aplikasi dan menunjukkan bagaimana framework Rocket dikonfigurasi. Melalui eksplorasi ini, saya belajar tentang:
+
+    - Bagaimana sistem fairing Rocket bekerja untuk menambahkan fungsionalitas tambahan ke server
+
+    - Bagaimana environtment variable dimuat dan digunakan di seluruh aplikasi
+
+   - Bagaimana arsitektur aplikasi disusun dengan pemisahan yang jelas antara controller, service, dan repository
+
+2. Pola Observer dan Skalabilitas:
+
+    Pola Observer secara signifikan menyederhanakan penambahan lebih banyak subscriber ke sistem. Dengan implementasi kita:
+
+    - Setiap instance Receiver baru dapat secara independen berlangganan ke jenis produk yang diminatinya
+    - Publisher (aplikasi utama) tidak perlu mengetahui apa pun tentang Receiver baru sebelumnya
+    - Menambahkan Receiver baru sesederhana memulai instance baru dengan port dan nama sendiri
+
+    Pemisahan antara subject dan observer ini adalah kekuatan utama dari pola ini.
+
+    Namun, menskalakan Publisher (aplikasi utama) akan lebih kompleks. Menjalankan beberapa instance aplikasi utama memerlukan:
+
+    - Database bersama untuk informasi produk di seluruh instance Publisher
+    - Mekanisme untuk menyinkronkan daftar subscription antara instance Publisher
+    - Penyeimbangan beban untuk permintaan yang masuk
+
+    Pola Observer saja tidak menyelesaikan kompleksitas ini, karena pada dasarnya dirancang untuk sistem notifikasi satu-ke-banyak. Untuk sistem banyak-ke-banyak dengan beberapa Publisher, kita akan memerlukan pola arsitektur tambahan seperti message broker atau event bus.
+
+3. Pengujian dan Dokumentasi:
+
+    Saya meningkatkan koleksi Postman dengan contoh dan deskripsi terperinci untuk setiap endpoint. Ini sangat berguna saat menguji aplikasi di beberapa instance. Dokumentasi membantu saya:
+
+    - Mengingat tujuan dan kebutuhan setiap endpoint
+    - Memahami format respons yang diharapkan
+    - Memecahkan masalah dengan membandingkan respons aktual vs. yang diharapkan
+
+    Untuk pekerjaan tutorial, memiliki panggilan API yang terdokumentasi dengan baik membuatnya lebih mudah untuk memverifikasi bahwa pola Observer berfungsi dengan benar. Untuk proyek kelompok, dokumentasi semacam itu akan sangat penting agar anggota tim memahami bagaimana berinteraksi dengan API tanpa perlu meninjau kode.
